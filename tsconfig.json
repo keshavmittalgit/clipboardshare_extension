@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+      "jsx": "react-jsx",
+      "module": "ES6",
+      "target": "ES6",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"],
+}
