@@ -1,12 +1,14 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
+const tailwindcss = require('tailwindcss');
+const autoprefixer = require('autoprefixer')
 
 module.exports = {
     mode: "development",
     devtool: 'source-map', // Improved source maps for debugging
     entry: {
-        popup: path.resolve('./src/popup/popup.tsx'),
+        popup: path.resolve('./src/popup/index.tsx'),
     },
     module: {
         rules: [
@@ -17,15 +19,23 @@ module.exports = {
             },
             {
                 test: /\.css$/i, // Matches .css files
-                use: ['style-loader', 'css-loader'], // Correct loader order
+                use: ['style-loader', 'css-loader', {
+                    loader: 'postcss-loader',
+                    options: {
+                        postcssOptions: {
+                            indent: 'postcss',
+                            plugins: [tailwindcss, autoprefixer]
+                        }
+                    }
+                }
+                ], // Correct loader order
             },
         ],
     },
     plugins: [
         new CopyPlugin({
             patterns: [
-                { from: path.resolve('src/assets/manifest.json'), to: path.resolve(__dirname, 'dist') },
-                { from: path.resolve('src/assets'), to: path.resolve(__dirname, 'dist') },
+                { from: path.resolve('src/static'), to: path.resolve(__dirname, 'dist') },
             ],
         }),
         new HtmlPlugin({

@@ -1,9 +1,11 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import './popup.css'; // Relative path, correct
-import App from './App';
 
-const container = document.createElement('div');
-document.body.appendChild(container);
-const root = createRoot(container);
-root.render(<App/>);
+
+function Popup(){
+  return (
+    <div className='w-[200px] h-[300px]'>
+      <h1 className='text-3xl' >welcome to clipboard share</h1>
+    </div>
+  );
+};
+
+export default Popup;
