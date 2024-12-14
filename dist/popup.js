@@ -111,17 +111,30 @@ root.render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_popup__WEBPA
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ Popup)
 /* harmony export */ });
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 /* harmony import */ var _popup_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./popup.css */ "./src/popup/popup.css");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
 
 
+// import app from '../firebase/firebase'
+
+const LoginPage = () => {
+    const [email, setEmail] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)('');
+    const [password, setPassword] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)('');
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Add your login logic here
+        console.log('Email:', email);
+        console.log('Password:', password);
+    };
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "flex items-center justify-center bg-gray-100 w-[100%] h-[100%]", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "bg-white w-full max-w-md p-6", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h2", { className: "text-base font-bold pb-4", children: "Clip Board Share " }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h2", { className: "text-base font-bold pb-4", children: "Login " }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("form", { onSubmit: handleSubmit, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "mb-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("label", { htmlFor: "email", className: "block font-bold text-[14px] mb-2", children: ["Email", (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "text-blue-700", children: "*" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", { id: "email", type: "email", className: "border rounded-2xl px-4 py-2 w-full", value: email, onChange: (e) => setEmail(e.target.value), required: true, placeholder: "example@email.com" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "mb-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", { htmlFor: "password", className: "block font-bold mb-2 text-[14px]", children: "Password*" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", { id: "password", type: "password", className: "border rounded-2xl px-3 py-2 w-full", value: password, onChange: (e) => setPassword(e.target.value), required: true, minLength: 8 })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { type: "submit", className: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-2xl w-full", children: "Login" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "mt-4 text-center", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("p", { children: ["Don't have an account?", ' ', (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", { href: "#", className: "text-blue-600 hover:text-blue-700", children: "Register Now" })] }) })] }) }));
+};
 function Popup() {
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: 'w-[200px] h-[300px]', children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", { className: 'text-3xl', children: "welcome to clipboard share" }) }));
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "w-[330px] h-[350px] flex justify-center", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(LoginPage, {}) }) }));
 }
-;
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Popup);
 
 
 /***/ })
