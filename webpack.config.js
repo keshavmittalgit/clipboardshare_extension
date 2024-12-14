@@ -9,6 +9,8 @@ module.exports = {
     devtool: 'source-map', // Improved source maps for debugging
     entry: {
         popup: path.resolve('./src/popup/index.tsx'),
+        options: path.resolve('./src/options/index.tsx'),
+        background: path.resolve('./src/background/background.ts'),
     },
     module: {
         rules: [
@@ -43,6 +45,11 @@ module.exports = {
             filename: 'popup.html',
             chunks: ['popup'],
         }),
+        new HtmlPlugin({
+            title: 'ReactJs Boilerplate',
+            filename: 'options.html',
+            chunks: ['options'],
+        }),
     ],
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
@@ -52,4 +59,9 @@ module.exports = {
         filename: '[name].js',
         path: path.resolve(__dirname, 'dist'), // Correct output path
     },
+    optimization: {
+        splitChunks: {
+          chunks: 'all',
+        },
+    }
 };

@@ -13,10 +13,9 @@
     "default_title": "Clipboard_extension",
     "default_popup": "popup.html"
   },
-  "permissions": [
-    "activeTab",
-    "storage",
-    "identity",
-    "identity.email"
-  ]
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_page": "options.html",
+  "permissions": ["activeTab", "storage", "identity", "identity.email"]
 }
