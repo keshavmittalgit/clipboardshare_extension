@@ -1,4 +1,4 @@
-
+import './popup.css'
 
 function Popup(){
   return (
