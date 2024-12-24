@@ -32,6 +32,13 @@ module.exports = {
                 }
                 ], // Correct loader order
             },
+            {
+                test: /\.(png|jpe?g|gif|svg)$/i, // Matches image files
+                type: 'asset/resource',
+                generator: {
+                    filename: 'images/[name][hash][ext][query]', // Output folder and filename
+                },
+            },
         ],
     },
     plugins: [
