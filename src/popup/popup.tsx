@@ -1,39 +1,75 @@
-import React, { useState, useEffect } from "react";``
+import React, { useState, useEffect, useRef } from "react";
+``;
 import "./popup.css";
 import { motion, AnimatePresence } from "framer-motion";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { auth } from "../firebase/firebaseConfig";
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   onAuthStateChanged,
-  signOut // Added: signOut for logout functionality
+  signOut, // Added: signOut for logout functionality
 } from "firebase/auth";
 
-function LogedIn(){
-  // Added: Logout functionality
-  const handleLogout = async () => { // New: Function to handle user logout
+// Ensure you have the correct import
+
+const LoggedIn: React.FC = () => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogout = async () => {
     try {
-      await signOut(auth); // Changed: auth.signOut() to signOut(auth)
-      console.log("User logged out");
+      await signOut(auth);
+      console.log('User logged out');
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error('Logout error:', error);
     }
   };
 
-  return(
+  const sendDataToBackground = () => {
+    const data = inputRef.current?.value;
+
+    if (data) {
+      chrome.runtime.sendMessage(
+        { type: 'TEST_MESSAGE', payload: data },
+        (response) => {
+          console.log('Response from background:', response);
+        }
+      );
+    } else {
+      console.warn('No data to send.');
+    }
+  };
+
+  return (
     <div className="flex flex-col items-center justify-center h-full">
-      <h1 className="text-2xl font-bold mb-4">Welcome!</h1>
       <button
-        onClick={handleLogout} // New: Logout button handler
+        onClick={handleLogout}
         className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-3xl"
       >
         Logout
       </button>
+      <div className="flex justify-center mt-4">
+        <input
+          type="text"
+          ref={inputRef}
+          className="bg-slate-200 p-3 m-2"
+          placeholder="Enter data"
+          id="datatosend"
+        />
+        <button
+          className="bg-blue-700 text-white p-2 m-2 rounded"
+          onClick={sendDataToBackground}
+        >
+          Send
+        </button>
+      </div>
     </div>
   );
-}
+};
+
+
+
 
 
 function Navbar() {
@@ -64,21 +100,24 @@ function LoginPage({ togglePage }: { togglePage: () => void }) {
     setPasswordVisible(!passwordVisible);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => { // Changed: Made handleSubmit async
+  const handleSubmit = async (e: React.FormEvent) => {
+    // Changed: Made handleSubmit async
     e.preventDefault();
     setError(null); // Added: Reset error message before attempting login
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password); // New: Firebase login
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      ); // New: Firebase login
       console.log("User logged in:", userCredential.user);
       // Authentication state is handled by onAuthStateChanged in Popup component
-    } catch (error: any) { // Changed: Added type for error
+    } catch (error: any) {
+      // Changed: Added type for error
       console.error("Login error:", error);
       setError(error.message); // New: Set error message to display to user
     }
   };
-  
-
-  
 
   return (
     <div className="flex-row items-center justify-center w-[100%] h-[100%]  ">
@@ -125,7 +164,10 @@ function LoginPage({ togglePage }: { togglePage: () => void }) {
                 className="absolute right-3 focus:outline-none"
                 onClick={togglePasswordVisibility}
               >
-                <FontAwesomeIcon icon={passwordVisible ? faEye : faEyeSlash} className="text-gray-400 hover:text-gray-600" />
+                <FontAwesomeIcon
+                  icon={passwordVisible ? faEye : faEyeSlash}
+                  className="text-gray-400 hover:text-gray-600"
+                />
               </button>
             </div>
           </div>
@@ -140,7 +182,11 @@ function LoginPage({ togglePage }: { togglePage: () => void }) {
         <div className="mt-4 text-center text-sm">
           <p>
             Don't have an account?{" "}
-            <a href="#" className="text-blue-600 hover:text-blue-700" onClick={togglePage}>
+            <a
+              href="#"
+              className="text-blue-600 hover:text-blue-700"
+              onClick={togglePage}
+            >
               Sign up
             </a>
           </p>
@@ -150,7 +196,6 @@ function LoginPage({ togglePage }: { togglePage: () => void }) {
   );
 }
 
-
 function SignupPage({ togglePage }: { togglePage: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -158,20 +203,27 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
   const [error, setError] = useState<string | null>(null); // Added: State for error messages
 
   // Updated handleSubmit to use Firebase's createUserWithEmailAndPassword
-  const handleSubmit = async (e: React.FormEvent) => { // Changed: Made handleSubmit async
+  const handleSubmit = async (e: React.FormEvent) => {
+    // Changed: Made handleSubmit async
     e.preventDefault();
     setError(null); // Added: Reset error message
 
-    if (password !== confirmPassword) { // New: Password confirmation check
+    if (password !== confirmPassword) {
+      // New: Password confirmation check
       setError("Passwords do not match.");
       return;
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password); // New: Firebase signup
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      ); // New: Firebase signup
       console.log("User signed up:", userCredential.user);
       togglePage(); // New: Redirect to login after successful signup
-    } catch (error: any) { // Changed: Added type for error
+    } catch (error: any) {
+      // Changed: Added type for error
       console.error("Signup error:", error);
       setError(error.message); // New: Set error message to display to user
     }
@@ -200,7 +252,6 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
               placeholder="example@email.com"
             />
           </div>
-
           <div className="mb-4">
             <label
               htmlFor="password"
@@ -218,7 +269,6 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
               minLength={8}
             />
           </div>
-
           <div className="mb-4">
             <label
               htmlFor="confirmPassword"
@@ -236,9 +286,8 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
               minLength={8}
             />
           </div>
-
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>} {/* New: Display error message */}
-
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}{" "}
+          {/* New: Display error message */}
           <button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-3xl w-full text-[14px]"
@@ -249,7 +298,11 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
         <div className="mt-4 text-center text-sm">
           <p>
             You have an account?{" "}
-            <a href="#" className="text-blue-600 hover:text-blue-700" onClick={togglePage}>
+            <a
+              href="#"
+              className="text-blue-600 hover:text-blue-700"
+              onClick={togglePage}
+            >
               Login
             </a>
           </p>
@@ -257,7 +310,7 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
       </div>
     </div>
   );
-};
+}
 
 export default function Popup() {
   const [showSignupPage, setShowSignupPage] = useState(false); // State to toggle between LoginPage and SignupPage
@@ -268,8 +321,10 @@ export default function Popup() {
   };
 
   // Added: Listen for authentication state changes
-  useEffect(() => { // New: useEffect to handle auth state
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => { // New: Firebase auth listener
+  useEffect(() => {
+    // New: useEffect to handle auth state
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      // New: Firebase auth listener
       setUser(currentUser);
     });
 
@@ -281,7 +336,7 @@ export default function Popup() {
     <div className="w-[330px] h-[100%] justify-center flex-row">
       <Navbar />
       {user ? ( // New: Conditional rendering based on user authentication
-        <LogedIn />
+        <LoggedIn />
       ) : (
         <AnimatePresence mode="wait">
           {showSignupPage ? (
