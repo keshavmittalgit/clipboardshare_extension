@@ -12,6 +12,7 @@ import {
   signOut, // Added: signOut for logout functionality
 } from "firebase/auth";
 
+
 // Ensure you have the correct import
 
 const LoggedIn: React.FC = () => {
@@ -27,17 +28,36 @@ const LoggedIn: React.FC = () => {
   };
 
   const sendDataToBackground = () => {
-    const data = inputRef.current?.value;
+    const data:string = inputRef.current?.value;
+    const user = auth.currentUser;
+  
+    if (data && user) {
+      const uid:string = user.uid;
 
-    if (data) {
+      const payload = {
+        [uid]:{
+          data:data
+        }
+      }
+
+  
       chrome.runtime.sendMessage(
-        { type: 'TEST_MESSAGE', payload: data },
+        { type: 'TEST_MESSAGE', payload },
         (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('Message sending failed:', chrome.runtime.lastError);
+            return;
+          }
           console.log('Response from background:', response);
         }
       );
     } else {
-      console.warn('No data to send.');
+      if (!data) {
+        console.warn('No data to send.');
+      }
+      if (!user) {
+        console.warn('User not authenticated.');
+      }
     }
   };
 
@@ -77,7 +97,7 @@ function Navbar() {
     <div className=" w-full max-w-md p-4 pb-0">
       <div className="bg-black/10 backdrop-blur-[10px] rounded-xl w-[100%] flex pl-4 items-center py-3 ">
         <h2 className="text-xl font-bold pr-3  flex gap-1 items-center justify-center">
-          <img src="./logo.svg" alt="" className="pr-[4px]" />
+          {/* <img src="./logo.svg" alt="" className="pr-[4px]" /> */}
           <div>
             <span className="">ClipShare</span>{" "}
             <span className="text-[12px] font-normal px-[2px] ">for{"  "}</span>

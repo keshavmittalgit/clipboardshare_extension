@@ -13,12 +13,12 @@
     "default_title": "Clipboard_extension",
     "default_popup": "popup.html"
   },
-  "resources": [
-    "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-  ],
+  
   "background": {
     "service_worker": "background.js"
   },
   "options_page": "options.html",
-  "permissions": ["activeTab", "storage", "identity", "identity.email","runtime"]
+  "permissions": ["activeTab", "storage", "clipboardWrite"]
 }
+
+
