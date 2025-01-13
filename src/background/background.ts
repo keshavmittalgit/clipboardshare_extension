@@ -1,17 +1,23 @@
 console.log("Background script running...");
+import { onAuthStateChanged } from "firebase/auth";
 
-import { ref, set } from "firebase/database";
-import { db } from "../firebase/firebaseConfig";
+import {addDoc, collection, setDoc, doc, updateDoc} from "firebase/firestore";
+import { db, auth} from "../firebase/firebaseConfig";
 
-function sendUid2Data(data) {
-  const uid2Ref = ref(db);
-  set(uid2Ref, data)
-    .then(() => {
-      console.log("Data saved successfully!");
-    })
-    .catch((error) => {
-      console.log("Error saving data:", error);
-    });
+
+async function updateData(payload) {
+  try {
+    // 'payload' follows the structure:
+    // { [uid]: { data: data } }
+    const user = auth.currentUser;
+    const documentRef = doc(db, "users" , user.uid);
+
+    // Update the document with the new payload
+    await updateDoc(documentRef, payload);
+    console.log("Data successfully updated!");
+  } catch (error) {
+    console.error("Error updating data:", error);
+  }
 }
 
 chrome.runtime.onMessage.addListener(
@@ -26,7 +32,8 @@ chrome.runtime.onMessage.addListener(
       // Existing SEND_DATA handling...
     } else if (message.type === "TEST_MESSAGE") {
       const data = message.payload;
-      sendUid2Data(data);
+      updateData(data);
+      
 
       console.log("Received TEST_MESSAGE:", message.payload);
 
@@ -35,4 +42,14 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, store user info in chrome.storage
+    chrome.storage.local.set({ user: { uid: user.uid, email: user.email } });
+  } else {
+    // User is signed out, remove user info from chrome.storage
+    chrome.storage.local.remove('user');
+  }
+});
 

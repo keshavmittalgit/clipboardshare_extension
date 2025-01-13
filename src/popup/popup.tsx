@@ -4,18 +4,18 @@ import "./popup.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { auth } from "../firebase/firebaseConfig";
+import { auth, db } from "../firebase/firebaseConfig";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signOut, // Added: signOut for logout functionality
 } from "firebase/auth";
-
+import { doc, setDoc,} from "firebase/firestore";
 
 // Ensure you have the correct import
 
-const LoggedIn: React.FC = () => {
+function LoggedIn() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleLogout = async () => {
@@ -27,17 +27,17 @@ const LoggedIn: React.FC = () => {
     }
   };
 
-  const sendDataToBackground = () => {
-    const data:string = inputRef.current?.value;
-    const user = auth.currentUser;
   
-    if (data && user) {
-      const uid:string = user.uid;
 
+  const sendDataToBackground = () => {
+    
+    const data:string = inputRef.current?.value;
+    if(!data){
+      console.log('input is empty')
+      return
+    }
       const payload = {
-        [uid]:{
           data:data
-        }
       }
 
   
@@ -51,15 +51,7 @@ const LoggedIn: React.FC = () => {
           console.log('Response from background:', response);
         }
       );
-    } else {
-      if (!data) {
-        console.warn('No data to send.');
-      }
-      if (!user) {
-        console.warn('User not authenticated.');
-      }
     }
-  };
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
@@ -87,7 +79,6 @@ const LoggedIn: React.FC = () => {
     </div>
   );
 };
-
 
 
 
@@ -220,8 +211,22 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState(""); // Added: confirmPassword state
-  const [error, setError] = useState<string | null>(null); // Added: State for error messages
+  const [error, setError] = useState<string | null>(null); 
 
+  async function addData(payload = {data:""}) {
+    try {
+      // Assuming 'payload' follows the structure:
+      const user = auth.currentUser;
+    
+      // { [uid]: { data: data } }
+      const documentRef = doc(db, "users", user.uid);
+  
+      await setDoc(documentRef, payload);
+      console.log("Data successfully stored!");
+    } catch (error) {
+      console.error("Error storing data:", error);
+    }
+  }
   // Updated handleSubmit to use Firebase's createUserWithEmailAndPassword
   const handleSubmit = async (e: React.FormEvent) => {
     // Changed: Made handleSubmit async
@@ -241,6 +246,7 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
         password
       ); // New: Firebase signup
       console.log("User signed up:", userCredential.user);
+      addData(); // New: Add data to Firestore
       togglePage(); // New: Redirect to login after successful signup
     } catch (error: any) {
       // Changed: Added type for error
