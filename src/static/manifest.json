@@ -17,8 +17,16 @@
   "background": {
     "service_worker": "background.js"
   },
+  
   "options_page": "options.html",
-  "permissions": ["activeTab", "storage", "clipboardWrite"]
+  "permissions": ["activeTab", "tabs", "storage", "clipboardWrite"],
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"]
+    }
+  ]
 }
 
 

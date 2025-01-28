@@ -59,9 +59,10 @@ const webConfig = {
   entry: {
     popup: path.resolve("./src/popup/index.tsx"),
     options: path.resolve("./src/options/index.tsx"),
+    contentScript: path.resolve("./src/contentScript/contentScript.ts"),
   },
   plugins: [
-    new CopyPlugin({
+    new CopyPlugin({  
       patterns: [
         {
           from: path.resolve("src/static"),

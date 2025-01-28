@@ -1,16 +1,15 @@
 console.log("Background script running...");
-import { onAuthStateChanged } from "firebase/auth";
+// import { onAuthStateChanged } from "firebase/auth";re
 
-import {addDoc, collection, setDoc, doc, updateDoc} from "firebase/firestore";
-import { db, auth} from "../firebase/firebaseConfig";
-
+import { doc, updateDoc, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../firebase/firebaseConfig";
 
 async function updateData(payload) {
   try {
     // 'payload' follows the structure:
-    // { [uid]: { data: data } }
+    // { [uid]: { data: data } }F
     const user = auth.currentUser;
-    const documentRef = doc(db, "users" , user.uid);
+    const documentRef = doc(db, "users", user.uid);
 
     // Update the document with the new payload
     await updateDoc(documentRef, payload);
@@ -32,9 +31,11 @@ chrome.runtime.onMessage.addListener(
       // Existing SEND_DATA handling...
     } else if (message.type === "TEST_MESSAGE") {
       const data = message.payload;
-      updateData(data);
-      
 
+      updateData(data);
+      // alert("Data updated successfully!");
+
+      
       console.log("Received TEST_MESSAGE:", message.payload);
 
       sendResponse({ status: "Test message received" });
@@ -43,13 +44,5 @@ chrome.runtime.onMessage.addListener(
 );
 
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is signed in, store user info in chrome.storage
-    chrome.storage.local.set({ user: { uid: user.uid, email: user.email } });
-  } else {
-    // User is signed out, remove user info from chrome.storage
-    chrome.storage.local.remove('user');
-  }
-});
+
 
