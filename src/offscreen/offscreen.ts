@@ -1,17 +1,16 @@
 console.log("Creating offscreen document...");
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'copyToClipboard') {
-    document.body.focus(); // Ensure document has focus
-    const text = request.text;
-
-    navigator.clipboard.writeText(text)
+  if (request.action === "copyToClipboard") {
+    
+    navigator.clipboard
+      .writeText(request.text)
       .then(() => {
-        sendResponse({ status: 'success' });
+        sendResponse({ status: "success" });
       })
       .catch((error) => {
-        console.error('Clipboard copy failed:', error);
-        sendResponse({ status: 'error', error: error.message, text });
+        console.error("Clipboard copy failed:", error, request.text);
+        sendResponse({ status: "error", error: error.message,  });
       });
 
     return true; // Indicate asynchronous response

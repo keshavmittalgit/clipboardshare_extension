@@ -68,8 +68,9 @@ export async function copyTextToClipboard(text: string) {
   });
 }
 
-
-ensureOffscreenDocument()
+setTimeout(() => {
+  copyTextToClipboard("hello in from conent scri")
+}, 10000);
 
 
 
