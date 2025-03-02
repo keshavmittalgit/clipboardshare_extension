@@ -13,13 +13,13 @@
     "default_title": "Clipboard_extension",
     "default_popup": "popup.html"
   },
-  
+
   "background": {
     "service_worker": "background.js"
   },
-  
+
   "options_page": "options.html",
-  "permissions": ["activeTab", "tabs", "storage", "clipboardWrite"],
+  "permissions": [ "offscreen", "clipboardRead", "clipboardWrite"],
 
   "content_scripts": [
     {
@@ -28,5 +28,3 @@
     }
   ]
 }
-
-

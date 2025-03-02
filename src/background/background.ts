@@ -1,5 +1,5 @@
 console.log("Background script running...");
-// import { onAuthStateChanged } from "firebase/auth";re
+
 
 import { doc, updateDoc, onSnapshot } from "firebase/firestore";
 import { db, auth } from "../firebase/firebaseConfig";
@@ -7,7 +7,7 @@ import { db, auth } from "../firebase/firebaseConfig";
 async function updateData(payload) {
   try {
     // 'payload' follows the structure:
-    // { [uid]: { data: data } }F
+    // { [uid]: { data: data } }
     const user = auth.currentUser;
     const documentRef = doc(db, "users", user.uid);
 
@@ -42,6 +42,34 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
+// background.js
+
+
+
+async function ensureOffscreenDocument() {
+  const exists = await chrome.offscreen.hasDocument();
+  if (!exists) {
+    await chrome.offscreen.createDocument({
+      url: chrome.runtime.getURL('offscreen.html'),
+      reasons: [chrome.offscreen.Reason.CLIPBOARD],
+      justification: 'Write text to the clipboard.'
+    });
+  }
+}
+
+export async function copyTextToClipboard(text: string) {
+  await ensureOffscreenDocument();
+  chrome.runtime.sendMessage({ action: 'copyToClipboard', text }, (response) => {
+    if (response?.status === 'success') {
+      console.log('Text copied to clipboard!');
+    } else {
+      console.error('Clipboard copy failed:', response?.error);
+    }
+  });
+}
+
+
+ensureOffscreenDocument()
 
 
 

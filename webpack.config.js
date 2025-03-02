@@ -60,6 +60,7 @@ const webConfig = {
     popup: path.resolve("./src/popup/index.tsx"),
     options: path.resolve("./src/options/index.tsx"),
     contentScript: path.resolve("./src/contentScript/contentScript.ts"),
+    offscreen: path.resolve("./src/offscreen/offscreen.ts"),
   },
   plugins: [
     new CopyPlugin({  
@@ -68,6 +69,11 @@ const webConfig = {
           from: path.resolve("src/static"),
           to: path.resolve(__dirname, "dist"),
         },
+        {
+          from: path.resolve("src/offscreen/offscreen.html"),
+          to: path.resolve(__dirname, "dist"),
+        },
+
       ],
     }),
     new HtmlPlugin({
