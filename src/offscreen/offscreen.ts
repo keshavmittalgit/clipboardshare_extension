@@ -1,4 +1,5 @@
 console.log("Creating offscreen document...");
+console.log(window)
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "copyToClipboard") {
@@ -19,4 +20,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 setInterval(() => {
   console.log("Offscreen document is still running...");
-}, 10000);
+}, 3000);
+
+

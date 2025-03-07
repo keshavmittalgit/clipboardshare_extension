@@ -11,7 +11,7 @@ import {
   onAuthStateChanged,
   signOut, // Added: signOut for logout functionality
 } from "firebase/auth";
-import { doc, setDoc,} from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 // Ensure you have the correct import
 
@@ -21,37 +21,45 @@ function LoggedIn() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      console.log('User logged out');
+      console.log("User logged out");
+
+      // Send a logout message to the background script and wait for its response
+      chrome.runtime.sendMessage({ type: "LOGOUT" }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error(
+            "Error receiving logout response:",
+            chrome.runtime.lastError
+          );
+          return;
+        }
+        console.log("Received logout message from background:", response);
+      });
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
-  
-
   const sendDataToBackground = () => {
-    
-    const data:string = inputRef.current?.value;
-    if(!data){
-      console.log('input is empty')
-      return
+    const data: string = inputRef.current?.value;
+    if (!data) {
+      console.log("input is empty");
+      return;
     }
-      const payload = {
-          data:data
-      }
+    const payload = {
+      data: data,
+    };
 
-  
-      chrome.runtime.sendMessage(
-        { type: 'TEST_MESSAGE', payload },
-        (response) => {
-          if (chrome.runtime.lastError) {
-            console.error('Message sending failed:', chrome.runtime.lastError);
-            return;
-          }
-          console.log('Response from background:', response);
+    chrome.runtime.sendMessage(
+      { type: "TEST_MESSAGE", payload },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          console.error("Message sending failed:", chrome.runtime.lastError);
+          return;
         }
-      );
-    }
+        console.log("Response from background:", response);
+      }
+    );
+  };
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
@@ -78,10 +86,7 @@ function LoggedIn() {
       </div>
     </div>
   );
-};
-
-
-
+}
 
 function Navbar() {
   return (
@@ -211,16 +216,16 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState(""); // Added: confirmPassword state
-  const [error, setError] = useState<string | null>(null); 
+  const [error, setError] = useState<string | null>(null);
 
-  async function addData(payload = {data:""}) {
+  async function addData(payload = { data: "" }) {
     try {
       // Assuming 'payload' follows the structure:
       const user = auth.currentUser;
-    
+
       // { [uid]: { data: data } }
       const documentRef = doc(db, "users", user.uid);
-  
+
       await setDoc(documentRef, payload);
       console.log("Data successfully stored!");
     } catch (error) {
@@ -348,14 +353,26 @@ export default function Popup() {
 
   // Added: Listen for authentication state changes
   useEffect(() => {
-    // New: useEffect to handle auth state
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      // New: Firebase auth listener
+    const sendMessage = () => {
+      chrome.runtime.sendMessage({ type: "AUTH_CHECK" }, (response) => {
+        console.log("Response from background:", response);
+        setUser(response || null);
+      });
+    };
+
+    sendMessage();
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      console.log("Firebase auth state changed:", currentUser);
       setUser(currentUser);
+
     });
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe(); // New: Cleanup function
+    return () => {
+      unsubscribeAuth();
+      chrome.runtime.onMessage.removeListener(sendMessage);
+      console.log("Cleanup: Removed message listener");
+    };
   }, []);
 
   return (
@@ -371,7 +388,7 @@ export default function Popup() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.05 }}
+              transition={{ duration: 0.01 }}
             >
               <SignupPage togglePage={togglePage} />
             </motion.div>
@@ -381,7 +398,7 @@ export default function Popup() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.05 }}
+              transition={{ duration: 0.01}}
             >
               <LoginPage togglePage={togglePage} />
             </motion.div>
