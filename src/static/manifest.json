@@ -1,30 +1,27 @@
 {
-  "manifest_version": 3,
-  "name": "Clipboard Share",
-  "version": "0.1.0",
-  "description": "My Chrome Extension",
-  "icons": {
-    "16": "icons/icon_16.png",
-    "32": "icons/icon_32.png",
-    "48": "icons/icon_48.png",
-    "128": "icons/icon_128.png"
-  },
-  "action": {
-    "default_title": "Clipboard_extension",
-    "default_popup": "popup.html"
-  },
-
-  "background": {
-    "service_worker": "background.js"
-  },
-
-  "options_page": "options.html",
-  "permissions": [ "offscreen", "clipboardRead", "clipboardWrite"],
-
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["contentScript.js"]
-    }
-  ]
+    "manifest_version": 3,
+    "name": "react-boilerplate",
+    "description": "react-boilerplate for chrome extension",
+    "version": "1.0.0",
+    "action" : {
+        "default_popup": "popup.html",
+        "default_title": "React Boilerplate",
+        "default_icon" : "icon.png"
+    },
+    "permissions": [ "offscreen", "clipboardRead", "clipboardWrite", "storage"],
+    "icons": {
+        "16" : "icon.png",
+        "48" : "icon.png",
+        "128" : "icon.png"
+    },
+    "options_page": "options.html",
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["contentScript.js"]
+        }
+    ]
 }

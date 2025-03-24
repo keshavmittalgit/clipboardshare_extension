@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-``;
 import "./popup.css";
-import { motion, AnimatePresence } from "framer-motion";
+// import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { auth, db } from "../firebase/firebaseConfig";
@@ -9,11 +8,9 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  signOut, // Added: signOut for logout functionality
+  signOut,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-
-// Ensure you have the correct import
 
 function LoggedIn() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,44 +42,60 @@ function LoggedIn() {
       console.log("input is empty");
       return;
     }
-    const payload = {
-      data: data,
-    };
+    const payload = { data };
 
-    chrome.runtime.sendMessage(
-      { type: "TEST_MESSAGE", payload },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          console.error("Message sending failed:", chrome.runtime.lastError);
-          return;
-        }
-        console.log("Response from background:", response);
+    chrome.runtime.sendMessage({ type: "TEST_MESSAGE", payload }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error("Message sending failed:", chrome.runtime.lastError);
+        return;
       }
-    );
+      console.log("Response from background:", response);
+    });
+  };
+
+  const copyTextToClipboard = async (text: string): Promise<void> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      console.log('Text copied to clipboard successfully');
+    } catch (error) {
+      console.error('Error copying text: ', error);
+    }
+  };
+
+  // Handler for button click that calls the clipboard function.
+  const handleCopyClick = () => {
+    const textToCopy = 'Hello, world!';
+    copyTextToClipboard(textToCopy);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full">
+    <div className="flex flex-col items-center justify-center h-full gap-4 px-4">
       <button
         onClick={handleLogout}
-        className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-3xl"
+        className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-3xl mt-2"
       >
         Logout
       </button>
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-between gap-3 w-full">
         <input
           type="text"
           ref={inputRef}
-          className="bg-slate-200 p-3 m-2"
+          className="bg-slate-200 p-3 w-full"
           placeholder="Enter data"
           id="datatosend"
         />
         <button
-          className="bg-blue-700 text-white p-2 m-2 rounded"
+          className="bg-blue-700 text-white p-2 rounded"
           onClick={sendDataToBackground}
         >
           Send
         </button>
+      </div>
+      <div className="flex justify-center items-center gap-2 p-2">
+        <button className="border-red-700 bg-purple-400" onClick={handleCopyClick}>
+          write from clipboard
+        </button>
+        <button className="bg-purple-400">read from clipboard</button>
       </div>
     </div>
   );
@@ -90,15 +103,13 @@ function LoggedIn() {
 
 function Navbar() {
   return (
-    <div className=" w-full max-w-md p-4 pb-0">
-      <div className="bg-black/10 backdrop-blur-[10px] rounded-xl w-[100%] flex pl-4 items-center py-3 ">
-        <h2 className="text-xl font-bold pr-3  flex gap-1 items-center justify-center">
-          {/* <img src="./logo.svg" alt="" className="pr-[4px]" /> */}
+    <div className="w-full max-w-md p-4 pb-0">
+      <div className="bg-black/10 backdrop-blur-[10px] rounded-xl w-full flex pl-4 items-center py-3">
+        <h2 className="text-xl font-bold pr-3 flex gap-1 items-center justify-center">
           <div>
-            <span className="">ClipShare</span>{" "}
-            <span className="text-[12px] font-normal px-[2px] ">for{"  "}</span>
-            {"  "}
-            <span className="text-[14px] font-medium">browers extension</span>
+            <span>ClipShare</span>{" "}
+            <span className="text-[12px] font-normal px-[2px]">for</span>{" "}
+            <span className="text-[14px] font-medium">browser extension</span>
           </div>
         </h2>
       </div>
@@ -117,35 +128,25 @@ function LoginPage({ togglePage }: { togglePage: () => void }) {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    // Changed: Made handleSubmit async
     e.preventDefault();
-    setError(null); // Added: Reset error message before attempting login
+    setError(null);
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      ); // New: Firebase login
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log("User logged in:", userCredential.user);
-      // Authentication state is handled by onAuthStateChanged in Popup component
+      // onAuthStateChanged will handle updating the UI based on authentication
     } catch (error: any) {
-      // Changed: Added type for error
       console.error("Login error:", error);
-      setError(error.message); // New: Set error message to display to user
+      setError(error.message);
     }
   };
 
   return (
-    <div className="flex-row items-center justify-center w-[100%] h-[100%]  ">
+    <div className="flex-row items-center justify-center w-full h-full">
       <div className="w-full max-w-md p-6 pt-1">
-        <h2 className="text-lg font-bold mb-6 mt-4">Login </h2>
-
+        <h2 className="text-lg font-bold mb-6 mt-4">Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block font-medium text-[14px] mb-2"
-            >
+            <label htmlFor="email" className="block font-medium text-[14px] mb-2">
               Email<span className="text-blue-700">*</span>
             </label>
             <input
@@ -159,10 +160,7 @@ function LoginPage({ togglePage }: { togglePage: () => void }) {
             />
           </div>
           <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block font-medium text-[14px] mb-2"
-            >
+            <label htmlFor="password" className="block font-medium text-[14px] mb-2">
               Password<span className="text-blue-700">*</span>
             </label>
             <div className="relative flex items-center">
@@ -187,7 +185,6 @@ function LoginPage({ togglePage }: { togglePage: () => void }) {
               </button>
             </div>
           </div>
-
           <button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-3xl w-full text-[14px]"
@@ -198,11 +195,7 @@ function LoginPage({ togglePage }: { togglePage: () => void }) {
         <div className="mt-4 text-center text-sm">
           <p>
             Don't have an account?{" "}
-            <a
-              href="#"
-              className="text-blue-600 hover:text-blue-700"
-              onClick={togglePage}
-            >
+            <a href="#" className="text-blue-600 hover:text-blue-700" onClick={togglePage}>
               Sign up
             </a>
           </p>
@@ -215,62 +208,47 @@ function LoginPage({ togglePage }: { togglePage: () => void }) {
 function SignupPage({ togglePage }: { togglePage: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // Added: confirmPassword state
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   async function addData(payload = { data: "" }) {
     try {
-      // Assuming 'payload' follows the structure:
       const user = auth.currentUser;
-
-      // { [uid]: { data: data } }
       const documentRef = doc(db, "users", user.uid);
-
       await setDoc(documentRef, payload);
       console.log("Data successfully stored!");
     } catch (error) {
       console.error("Error storing data:", error);
     }
   }
-  // Updated handleSubmit to use Firebase's createUserWithEmailAndPassword
+
   const handleSubmit = async (e: React.FormEvent) => {
-    // Changed: Made handleSubmit async
     e.preventDefault();
-    setError(null); // Added: Reset error message
+    setError(null);
 
     if (password !== confirmPassword) {
-      // New: Password confirmation check
       setError("Passwords do not match.");
       return;
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      ); // New: Firebase signup
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       console.log("User signed up:", userCredential.user);
-      addData(); // New: Add data to Firestore
-      togglePage(); // New: Redirect to login after successful signup
+      addData();
+      togglePage();
     } catch (error: any) {
-      // Changed: Added type for error
       console.error("Signup error:", error);
-      setError(error.message); // New: Set error message to display to user
+      setError(error.message);
     }
   };
 
   return (
-    <div className="flex-row items-center justify-center w-[100%] h-[100%]">
+    <div className="flex-row items-center justify-center w-full h-full">
       <div className="w-full max-w-md p-6 pt-1">
         <h2 className="text-lg font-bold mb-6 mt-4">Sign up</h2>
-
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block font-medium text-[14px] mb-2"
-            >
+            <label htmlFor="email" className="block font-medium text-[14px] mb-2">
               Email<span className="text-blue-700">*</span>
             </label>
             <input
@@ -284,10 +262,7 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
             />
           </div>
           <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block font-medium text-[14px] mb-2"
-            >
+            <label htmlFor="password" className="block font-medium text-[14px] mb-2">
               Password<span className="text-blue-700">*</span>
             </label>
             <input
@@ -301,10 +276,7 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
             />
           </div>
           <div className="mb-4">
-            <label
-              htmlFor="confirmPassword"
-              className="block font-medium text-[14px] mb-2"
-            >
+            <label htmlFor="confirmPassword" className="block font-medium text-[14px] mb-2">
               Confirm Password<span className="text-blue-700">*</span>
             </label>
             <input
@@ -317,8 +289,7 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
               minLength={8}
             />
           </div>
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}{" "}
-          {/* New: Display error message */}
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-3xl w-full text-[14px]"
@@ -329,11 +300,7 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
         <div className="mt-4 text-center text-sm">
           <p>
             You have an account?{" "}
-            <a
-              href="#"
-              className="text-blue-600 hover:text-blue-700"
-              onClick={togglePage}
-            >
+            <a href="#" className="text-blue-600 hover:text-blue-700" onClick={togglePage}>
               Login
             </a>
           </p>
@@ -344,19 +311,23 @@ function SignupPage({ togglePage }: { togglePage: () => void }) {
 }
 
 export default function Popup() {
-  const [showSignupPage, setShowSignupPage] = useState(false); // State to toggle between LoginPage and SignupPage
-  const [user, setUser] = useState<any>(null); // Added: State to hold the authenticated user
+  const [showSignupPage, setShowSignupPage] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true); // New: loading state
 
   const togglePage = () => {
-    setShowSignupPage((prev) => !prev); // Toggle the state
+    setShowSignupPage((prev) => !prev);
   };
 
-  // Added: Listen for authentication state changes
   useEffect(() => {
     const sendMessage = () => {
       chrome.runtime.sendMessage({ type: "AUTH_CHECK" }, (response) => {
         console.log("Response from background:", response);
+        // Optionally update user state from background response
         setUser(response || null);
+        if(response){
+          setIsLoading(false);
+        }
       });
     };
 
@@ -365,7 +336,7 @@ export default function Popup() {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       console.log("Firebase auth state changed:", currentUser);
       setUser(currentUser);
-
+      setIsLoading(false);
     });
 
     return () => {
@@ -378,32 +349,18 @@ export default function Popup() {
   return (
     <div className="w-[330px] h-[100%] justify-center flex-row">
       <Navbar />
-      {user ? ( // New: Conditional rendering based on user authentication
+      {isLoading ? (
+        <div className="flex justify-center items-center h-full">....</div>
+      ) : user ? (
         <LoggedIn />
       ) : (
-        <AnimatePresence mode="wait">
+        <>
           {showSignupPage ? (
-            <motion.div
-              key="signup"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.01 }}
-            >
-              <SignupPage togglePage={togglePage} />
-            </motion.div>
+            <SignupPage togglePage={togglePage} />
           ) : (
-            <motion.div
-              key="login"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.01}}
-            >
-              <LoginPage togglePage={togglePage} />
-            </motion.div>
+            <LoginPage togglePage={togglePage} />
           )}
-        </AnimatePresence>
+        </>
       )}
     </div>
   );

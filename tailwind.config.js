@@ -1,14 +1,9 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: 'media',
-  content: ["./src/**/*.{html,js,ts,jsx,tsx,css}"],
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
   theme: {
-    extend: {
-      fontFamily: {
-        roboto: ['Roboto', 'sans-serif'],
-      },
-    },
+    extend: {},
   },
   plugins: [],
 }
-
